@@ -12,18 +12,18 @@ import { executeCmdSync, checkFileExists } from './utils'
  * This build script is run after the Skia Binaries are built.
  */
 
-console.log('Building iOS Fat Libraries from Skia Binaries')
+console.log('Building macOS Fat Libraries from Skia Binaries')
 console.log('')
 
 console.log('Checking prerequisites...')
 
 // Check deps
-Object.keys(configurations.ios.targets).forEach(targetKey => {
-  configurations.ios.outputNames.forEach(out => {
+Object.keys(configurations.macos.targets).forEach(targetKey => {
+  configurations.macos.outputNames.forEach(out => {
     checkFileExists(
-      `package/libs/ios/${targetKey}/${out}`,
-      `package/libs/ios/${targetKey}/${out}`,
-      `package/libs/ios/${targetKey}/${out} not found`
+      `package/libs/macos/${targetKey}/${out}`,
+      `package/libs/macos/${targetKey}/${out}`,
+      `package/libs/macos/${targetKey}/${out} not found`
     )
   })
 })
@@ -32,15 +32,15 @@ console.log('')
 console.log('Prerequisites met. Starting build.')
 console.log('')
 
-console.log('Building fat binary for iphone simulator')
-configurations.ios.outputNames.forEach(out => {
-  console.log(`Building fat binary for simulator for file ${out}`)
-  executeCmdSync(
-    `lipo -create package/libs/ios/x64/${out} package/libs/ios/arm64-iphonesimulator/${out} -output package/libs/ios/${
-      out.split('.')[0]
-    }.a`
-  )
-})
+// console.log('Building fat binary for iphone simulator')
+// configurations.ios.outputNames.forEach(out => {
+//   console.log(`Building fat binary for simulator for file ${out}`)
+//   executeCmdSync(
+//     `lipo -create package/libs/ios/x64/${out} package/libs/ios/arm64-iphonesimulator/${out} -output package/libs/ios/${
+//       out.split('.')[0]
+//     }.a`
+//   )
+// })
 
 console.log('')
 console.log('Building xcframeworks...')
@@ -48,12 +48,12 @@ console.log('Building xcframeworks...')
 configurations.ios.outputNames.forEach(out => {
   const libName = out.split('.')[0]
   console.log(`Building ${libName}.xcframework`)
-  executeCmdSync(`rm -rf ./package/libs/ios/${libName}.xcframework`)
+  executeCmdSync(`rm -rf ./package/libs/macos/${libName}.xcframework`)
   executeCmdSync(
     'xcodebuild -create-xcframework ' +
-      `-library ./package/libs/ios/${libName}.a ` +
-      `-library ./package/libs/ios/arm64-iphoneos/${libName}.a ` +
-      ` -output ./package/libs/ios/${libName}.xcframework `
+      `-library ./package/libs/macos/arm64/${libName}.a ` +
+      `-library ./package/libs/macos/arm64/${libName}.a ` +
+      ` -output ./package/libs/macos/${libName}.xcframework `
   )
 })
 
